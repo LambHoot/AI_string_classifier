@@ -115,6 +115,10 @@ namespace AI_A1
                 probD[1][k] = (probD[1][k] + 1) / (numWordsPerClass[1] + vocab.Count());
             }
 
+            int[] probOfClasses = new int[2];
+            probOfClasses[0] = numWordsPerClass[0] / vocab.Count();
+            probOfClasses[1] = numWordsPerClass[1] / vocab.Count();
+
         }
 
     }
