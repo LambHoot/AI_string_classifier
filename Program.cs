@@ -88,5 +88,27 @@ namespace AI_A1
                 testFeatures.Add(flags);
             }
         }
+
+        static private void bayes()
+        {
+            SortedDictionary<int, float[]> probD = new SortedDictionary<int, float[]>();
+            probD.Add(0, new float[vocab.Count()]);
+            probD.Add(1, new float[vocab.Count()]);
+            for (int k = 0; k < vocab.Count(); k++)
+            {
+                //frequency of word in class + 1
+                for(int l = 0; l < features.Count(); l++)
+                {
+                    if(features.ElementAt(l)[k] == 1)
+                    {//word has been found
+                        probD[features.ElementAt(l)[features.Count() - 1]][k] += 1;
+                    }
+                }
+
+
+            }
+
+        }
+
     }
 }
