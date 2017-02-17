@@ -29,7 +29,7 @@ namespace AI_A1
             buildTestingFeatures();
 
             //test against training -> high accuracy
-            bayes();
+            float accuracy = bayes();
 
             //test against test -> print compiled accuracy
 
@@ -78,6 +78,7 @@ namespace AI_A1
         static private void buildTestingFeatures()
         {
             string[] data = File.ReadAllLines("Resources/testdata.txt");
+            string[] labels = File.ReadAllLines("Resources/testlabels.txt");
 
             for (int i = 0; i < data.Count(); i++)
             {
@@ -86,11 +87,14 @@ namespace AI_A1
                 {
                     flags[j] = data[i].Contains(vocab.ElementAt(j)) ? 1 : 0;
                 }
-                testFeatures.Add(flags);
+                flags[flags.Count() - 1] = Convert.ToInt32(labels[i]);
+
+                features.Add(flags);
             }
         }
 
-        static private void bayes()
+        //returns the accuracy of this
+        static private float bayes()
         {
             SortedDictionary<int, float[]> probD = new SortedDictionary<int, float[]>();
             probD.Add(0, new float[vocab.Count()]);
@@ -106,35 +110,32 @@ namespace AI_A1
                         probD[features.ElementAt(l)[vocab.Count()]][k] += 1;
                     }
                 }
+            }
 
-                List<int[]> sentences0 = features.Where(x => x.ElementAt(vocab.Count()) == 0).ToList();
-                for(int u = 0; u < sentences0[0].Count() - 1; u++)
+            List<int[]> sentences0 = features.Where(x => x.ElementAt(vocab.Count()) == 0).ToList();
+            for (int u = 0; u < sentences0[0].Count() - 1; u++)
+            {
+                foreach (int[] sentence in sentences0)
                 {
-                    foreach(int[] sentence in sentences0)
+                    if (sentence[u] != 0)
                     {
-                        if(sentence[u] != 0)
-                        {
-                            numWordsPerClass[0]++;
-                            break;
-                        }
+                        numWordsPerClass[0]++;
+                        break;
                     }
                 }
+            }
 
-                List<int[]> sentences1 = features.Where(x => x.ElementAt(vocab.Count()) == 1).ToList();
-                for (int u = 0; u < sentences1[0].Count() - 1; u++)
+            List<int[]> sentences1 = features.Where(x => x.ElementAt(vocab.Count()) == 1).ToList();
+            for (int u = 0; u < sentences1[0].Count() - 1; u++)
+            {
+                foreach (int[] sentence in sentences1)
                 {
-                    foreach (int[] sentence in sentences1)
+                    if (sentence[u] != 0)
                     {
-                        if (sentence[u] != 0)
-                        {
-                            numWordsPerClass[1]++;
-                            break;
-                        }
+                        numWordsPerClass[1]++;
+                        break;
                     }
                 }
-
-
-
             }
 
             for (int k = 0; k < probD[0].Count(); k++)
@@ -147,10 +148,13 @@ namespace AI_A1
             probOfClasses[0] = numWordsPerClass[0] / (float)vocab.Count();
             probOfClasses[1] = numWordsPerClass[1] / (float)vocab.Count();
             float[] totalScores = { 0f, 0f };
+            int correct = 0;
 
             //get score for 0
             foreach (int[] wordsUsed in features)
             {
+                totalScores[0] = 0f;
+                totalScores[1] = 0f;
                 for (int j = 0; j < wordsUsed.Count() - 1; j++)
                 {
                     if(wordsUsed[j] == 1)
@@ -160,8 +164,19 @@ namespace AI_A1
                         totalScores[1] += probOfClasses[1] * probD[1][j];
                     }
                 }
-
+                //compare to actual
+                if( Math.Max(totalScores[0], totalScores[1]) == totalScores[0])
+                {
+                    if (wordsUsed[wordsUsed.Count() - 1] == 0)
+                        correct++;
+                }
+                if (Math.Max(totalScores[0], totalScores[1]) == totalScores[1])
+                {
+                    if (wordsUsed[wordsUsed.Count() - 1] == 1)
+                        correct++;
+                }
             }
+            return correct / (float)features.Count();
                 
 
             //get score for 1
