@@ -10,7 +10,7 @@ namespace AI_A1
     class Program
     {
         private static SortedSet<String> stops, vocab;
-        private static List<int[]> features = new List<int[]>();
+        private static List<int[]> trainedFeatures = new List<int[]>();
         private static List<int[]> testFeatures = new List<int[]>();
 
         static void Main(string[] args)
@@ -29,7 +29,9 @@ namespace AI_A1
             buildTestingFeatures();
 
             //test against training -> high accuracy
-            float accuracy = bayes();
+            float trainedAccuracy = bayes(trainedFeatures);
+            float testAccuracy = bayes(testFeatures);
+            var y = 0;
 
             //test against test -> print compiled accuracy
 
@@ -69,7 +71,7 @@ namespace AI_A1
                 }
                 flags[flags.Count() - 1] = Convert.ToInt32(labels[i]);
 
-                features.Add(flags);
+                trainedFeatures.Add(flags);
                 writer.WriteLine(string.Join(", ", flags));
             }
         }
@@ -89,12 +91,12 @@ namespace AI_A1
                 }
                 flags[flags.Count() - 1] = Convert.ToInt32(labels[i]);
 
-                features.Add(flags);
+                testFeatures.Add(flags);
             }
         }
 
         //returns the accuracy of this
-        static private float bayes()
+        static private float bayes(List<int[]> features)
         {
             SortedDictionary<int, float[]> probD = new SortedDictionary<int, float[]>();
             probD.Add(0, new float[vocab.Count()]);
