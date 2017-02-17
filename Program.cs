@@ -11,6 +11,7 @@ namespace AI_A1
     {
         private static SortedSet<String> stops, vocab;
         private static List<int[]> features = new List<int[]>();
+        private static List<int[]> testFeatures = new List<int[]>();
 
         static void Main(string[] args)
         {
@@ -24,9 +25,14 @@ namespace AI_A1
             buildFeatures();
             #endregion
 
+            //create testing feature list
+            buildTestingFeatures();
 
+            //test against training -> high accuracy
 
-            Console.WriteLine("fsaf");
+            //test against test -> print compiled accuracy
+
+            //print compiled accuracy -> results .txt
         }
 
         #region Preprocessing Methods
@@ -67,5 +73,20 @@ namespace AI_A1
             }
         }
         #endregion
+
+        static private void buildTestingFeatures()
+        {
+            string[] data = File.ReadAllLines("Resources/testdata.txt");
+
+            for (int i = 0; i < data.Count(); i++)
+            {
+                int[] flags = new int[vocab.Count + 1];
+                for (int j = 0; j < vocab.Count(); j++)
+                {
+                    flags[j] = data[i].Contains(vocab.ElementAt(j)) ? 1 : 0;
+                }
+                testFeatures.Add(flags);
+            }
+        }
     }
 }
