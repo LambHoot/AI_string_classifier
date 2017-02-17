@@ -104,9 +104,37 @@ namespace AI_A1
                     if(features.ElementAt(l)[k] == 1)
                     {//word has been found
                         probD[features.ElementAt(l)[vocab.Count()]][k] += 1;
-                        numWordsPerClass[features.ElementAt(l)[vocab.Count()]] += 1;
                     }
                 }
+
+                List<int[]> sentences0 = features.Where(x => x.ElementAt(vocab.Count()) == 0).ToList();
+                for(int u = 0; u < sentences0[0].Count() - 1; u++)
+                {
+                    foreach(int[] sentence in sentences0)
+                    {
+                        if(sentence[u] != 0)
+                        {
+                            numWordsPerClass[0]++;
+                            break;
+                        }
+                    }
+                }
+
+                List<int[]> sentences1 = features.Where(x => x.ElementAt(vocab.Count()) == 1).ToList();
+                for (int u = 0; u < sentences1[0].Count() - 1; u++)
+                {
+                    foreach (int[] sentence in sentences1)
+                    {
+                        if (sentence[u] != 0)
+                        {
+                            numWordsPerClass[1]++;
+                            break;
+                        }
+                    }
+                }
+
+
+
             }
 
             for (int k = 0; k < probD[0].Count(); k++)
@@ -115,9 +143,29 @@ namespace AI_A1
                 probD[1][k] = (probD[1][k] + 1) / (numWordsPerClass[1] + vocab.Count());
             }
 
-            int[] probOfClasses = new int[2];
-            probOfClasses[0] = numWordsPerClass[0] / vocab.Count();
-            probOfClasses[1] = numWordsPerClass[1] / vocab.Count();
+            float[] probOfClasses = new float[2];
+            probOfClasses[0] = numWordsPerClass[0] / (float)vocab.Count();
+            probOfClasses[1] = numWordsPerClass[1] / (float)vocab.Count();
+            float[] totalScores = { 0f, 0f };
+
+            //get score for 0
+            foreach (int[] wordsUsed in features)
+            {
+                for (int j = 0; j < wordsUsed.Count() - 1; j++)
+                {
+                    if(wordsUsed[j] == 1)
+                    {
+                        //find score for word in probD
+                        totalScores[0] += probOfClasses[0] * probD[0][j];
+                        totalScores[1] += probOfClasses[1] * probD[1][j];
+                    }
+                }
+
+            }
+                
+
+            //get score for 1
+
 
         }
 
