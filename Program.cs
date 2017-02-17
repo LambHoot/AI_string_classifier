@@ -15,25 +15,24 @@ namespace AI_A1
 
         static void Main(string[] args)
         {
-            string 
-                stopFile = args[0], 
+            string
+                stopFile = args[0],
                 trainingDataFile = args[1],
                 trainingLabelFile = args[2],
                 testingDataFile = args[3],
                 testingLabelFile = args[4];
 
-            #region Preprocessing
+            Console.WriteLine("Creating preprocessed files...\n");
             stops = buildSetFromFile(stopFile);
             vocab = buildSetFromFile(trainingDataFile);
             vocab.Remove("");
 
-            Console.WriteLine("{0} removed", vocab.RemoveWhere(x => stops.Contains(x)));
+            Console.WriteLine("{0} stop words removed.", vocab.RemoveWhere(x => stops.Contains(x)));
 
-            buildFeatures();
-            #endregion
+            //create feature list
+            buildTrainFeatures(trainingDataFile, trainingLabelFile);
 
-            //create testing feature list
-            buildTestingFeatures();
+            buildTestingFeatures(testingDataFile, testingLabelFile);
 
             //test against training -> high accuracy
             float trainedAccuracy = bayes(trainedFeatures);
@@ -55,18 +54,18 @@ namespace AI_A1
             return new SortedSet<string>(fullFile.Split(new string[] { "\n", "\r\n", " " }, StringSplitOptions.RemoveEmptyEntries).ToList<String>());
         }
 
-        static private void buildFeatures()
+        static private void buildTrainFeatures(string dataFile, string labelsFile)
         {
-            string[] data = File.ReadAllLines("Resources/traindata.txt");
-            string[] labels = File.ReadAllLines("Resources/trainlabels.txt");
-            
+            string[] data = File.ReadAllLines(dataFile);
+            string[] labels = File.ReadAllLines(labelsFile);
+
             StreamWriter writer = File.CreateText("Resources/preprocessed.txt");
             writer.WriteLine(string.Join(", ", vocab));
 
-            for(int i=0; i<data.Count(); i++)
+            for (int i = 0; i < data.Count(); i++)
             {
                 int[] flags = new int[vocab.Count + 1];
-                for(int j = 0; j < vocab.Count(); j++)
+                for (int j = 0; j < vocab.Count(); j++)
                 {
                     flags[j] = data[i].Contains(vocab.ElementAt(j)) ? 1 : 0;
                 }
@@ -78,10 +77,10 @@ namespace AI_A1
         }
         #endregion
 
-        static private void buildTestingFeatures()
+        static private void buildTestingFeatures(string dataFile, string labelsFile)
         {
-            string[] data = File.ReadAllLines("Resources/testdata.txt");
-            string[] labels = File.ReadAllLines("Resources/testlabels.txt");
+            string[] data = File.ReadAllLines(dataFile);
+            string[] labels = File.ReadAllLines(labelsFile);
 
             for (int i = 0; i < data.Count(); i++)
             {
@@ -106,9 +105,9 @@ namespace AI_A1
             for (int k = 0; k < vocab.Count(); k++)
             {
                 //frequency of word in classes
-                for(int l = 0; l < features.Count(); l++)
+                for (int l = 0; l < features.Count(); l++)
                 {
-                    if(features.ElementAt(l)[k] == 1)
+                    if (features.ElementAt(l)[k] == 1)
                     {//word has been found
                         probD[features.ElementAt(l)[vocab.Count()]][k] += 1;
                     }
@@ -160,7 +159,7 @@ namespace AI_A1
                 totalScores[1] = 0f;
                 for (int j = 0; j < wordsUsed.Count() - 1; j++)
                 {
-                    if(wordsUsed[j] == 1)
+                    if (wordsUsed[j] == 1)
                     {
                         //find score for word in probD
                         totalScores[0] += probOfClasses[0] * probD[0][j];
@@ -168,7 +167,7 @@ namespace AI_A1
                     }
                 }
                 //compare to actual
-                if( Math.Max(totalScores[0], totalScores[1]) == totalScores[0])
+                if (Math.Max(totalScores[0], totalScores[1]) == totalScores[0])
                 {
                     if (wordsUsed[wordsUsed.Count() - 1] == 0)
                         correct++;
@@ -180,11 +179,6 @@ namespace AI_A1
                 }
             }
             return correct / (float)features.Count();
-                
-
-            //get score for 1
-
-
         }
 
     }
