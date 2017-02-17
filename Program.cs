@@ -29,6 +29,7 @@ namespace AI_A1
             buildTestingFeatures();
 
             //test against training -> high accuracy
+            bayes();
 
             //test against test -> print compiled accuracy
 
@@ -101,7 +102,7 @@ namespace AI_A1
                 {
                     if(features.ElementAt(l)[k] == 1)
                     {//word has been found
-                        probD[features.ElementAt(l)[features.Count() - 1]][k] += 1;
+                        probD[features.ElementAt(l)[vocab.Count()]][k] += 1;
                     }
                 }
 
