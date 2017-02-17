@@ -95,18 +95,24 @@ namespace AI_A1
             SortedDictionary<int, float[]> probD = new SortedDictionary<int, float[]>();
             probD.Add(0, new float[vocab.Count()]);
             probD.Add(1, new float[vocab.Count()]);
+            int[] numWordsPerClass = new int[2];
             for (int k = 0; k < vocab.Count(); k++)
             {
-                //frequency of word in class + 1
+                //frequency of word in classes
                 for(int l = 0; l < features.Count(); l++)
                 {
                     if(features.ElementAt(l)[k] == 1)
                     {//word has been found
                         probD[features.ElementAt(l)[vocab.Count()]][k] += 1;
+                        numWordsPerClass[features.ElementAt(l)[vocab.Count()]] += 1;
                     }
                 }
+            }
 
-
+            for (int k = 0; k < probD[0].Count(); k++)
+            {
+                probD[0][k] = (probD[0][k] + 1) / (numWordsPerClass[0] + vocab.Count());
+                probD[1][k] = (probD[1][k] + 1) / (numWordsPerClass[1] + vocab.Count());
             }
 
         }
