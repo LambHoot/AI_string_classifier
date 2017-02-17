@@ -31,7 +31,12 @@ namespace AI_A1
             //test against training -> high accuracy
             float trainedAccuracy = bayes(trainedFeatures);
             float testAccuracy = bayes(testFeatures);
-            var y = 0;
+
+            StreamWriter writer = File.CreateText("Resources/results.txt");
+            writer.WriteLine("Trained Accuracy: " + trainedAccuracy + "\nFiles used: traindata.txt, trainlabels.txt");
+            writer.WriteLine("Test Accuracy: " + testAccuracy + "\nFiles used: testdata.txt, testlabels.txt");
+            writer.WriteLine("Thank you!");
+
 
             //test against test -> print compiled accuracy
 
