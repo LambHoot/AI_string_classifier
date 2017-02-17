@@ -15,10 +15,17 @@ namespace AI_A1
 
         static void Main(string[] args)
         {
+            string 
+                stopFile = args[0], 
+                trainingDataFile = args[1],
+                trainingLabelFile = args[2],
+                testingDataFile = args[3],
+                testingLabelFile = args[4];
 
             #region Preprocessing
-            buildStopList();
-            buildVocabulary();
+            stops = buildSetFromFile(stopFile);
+            vocab = buildSetFromFile(trainingDataFile);
+            vocab.Remove("");
 
             Console.WriteLine("{0} removed", vocab.RemoveWhere(x => stops.Contains(x)));
 
@@ -33,30 +40,19 @@ namespace AI_A1
             float testAccuracy = bayes(testFeatures);
 
             StreamWriter writer = File.CreateText("Resources/results.txt");
-            writer.WriteLine("Trained Accuracy: " + trainedAccuracy + "\nFiles used: traindata.txt, trainlabels.txt");
-            writer.WriteLine("Test Accuracy: " + testAccuracy + "\nFiles used: testdata.txt, testlabels.txt");
+            writer.WriteLine("Aassignment 1 q8 -  Training and Testing\nJacob Desrochers\tDenis Kefallinos\tPhilippe Miriello\n");
+            writer.WriteLine("Trained Accuracy: {0}\nFiles used: {1}, {2}", trainedAccuracy, trainingDataFile, trainingLabelFile);
+            writer.WriteLine("Test Accuracy: {0}\nFiles used: {1}, {2}", testAccuracy, testingDataFile, testingLabelFile);
             writer.WriteLine("Thank you!");
-
-
-            //test against test -> print compiled accuracy
-
-            //print compiled accuracy -> results .txt
+            writer.Close();
         }
 
         #region Preprocessing Methods
-        static public void buildStopList()
+        static public SortedSet<string> buildSetFromFile(string file)
         {
-            StreamReader r = new StreamReader("Resources/stoplist.txt");
+            StreamReader r = new StreamReader(file);
             var fullFile = r.ReadToEnd();
-            stops = new SortedSet<string>(fullFile.Split(new string[] { "\n", "\r\n"}, StringSplitOptions.RemoveEmptyEntries).ToList<String>());
-        }
-
-        static public void buildVocabulary()
-        {
-            StreamReader r = new StreamReader("Resources/traindata.txt");
-            var fullFile = r.ReadToEnd();
-            vocab = new SortedSet<string>(fullFile.Split(new string[] { "\n", "\r\n", " "}, StringSplitOptions.RemoveEmptyEntries).ToList<String>());
-            vocab.Remove("");
+            return new SortedSet<string>(fullFile.Split(new string[] { "\n", "\r\n", " " }, StringSplitOptions.RemoveEmptyEntries).ToList<String>());
         }
 
         static private void buildFeatures()
