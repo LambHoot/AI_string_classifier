@@ -40,14 +40,14 @@ namespace AI_A1
         {
             StreamReader r = new StreamReader("Resources/stoplist.txt");
             var fullFile = r.ReadToEnd();
-            stops = new SortedSet<string>(fullFile.Split('\n').ToList<String>());
+            stops = new SortedSet<string>(fullFile.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList<String>());
         }
 
         static public void buildVocabulary()
         {
             StreamReader r = new StreamReader("Resources/traindata.txt");
             var fullFile = r.ReadToEnd();
-            vocab = new SortedSet<string>(fullFile.Split('\n', ' ').ToList<String>());
+            vocab = new SortedSet<string>(fullFile.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList<String>());
             vocab.Remove("");
         }
 
